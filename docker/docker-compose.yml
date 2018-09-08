@@ -26,3 +26,5 @@ services:
       - "./data/jupyter/:/home/jovyan"
       - "../preprocess:/home/jovyan/preprocess"
       - "../data:/home/jovyan/data"
+    environment:
+      PYTHONPATH: /home/jovyan

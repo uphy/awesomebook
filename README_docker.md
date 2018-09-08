@@ -26,3 +26,12 @@ Login with the following DB config
 | Password | postgres |
 | Database | work |
 
+# Login to Jupyter Notebook
+
+Confirm token for login.
+
+```console
+$ docker-compose logs jupyter | grep token= | head -n1 | sed -e "s/.*token=\(.*\)/\1/"
+```
+
+Open http://localhost:8888/ and input the token.
