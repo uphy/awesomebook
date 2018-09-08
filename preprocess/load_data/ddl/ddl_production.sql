@@ -5,8 +5,4 @@ CREATE TABLE work.production_tb
   thickness FLOAT NOT NULL,
   fault_flg BOOLEAN NOT NULL
 );
-
-COPY work.production_tb
-FROM 's3://awesomebk/production.csv'
-CREDENTIALS 'aws_access_key_id=XXXXX;aws_secret_access_key=XXXXX'
-CSV IGNOREHEADER AS 1;
+COPY work.production_tb FROM '/data/production.csv'( delimiter ',', format csv, header true );

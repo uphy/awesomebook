@@ -41,30 +41,11 @@ CREATE TABLE work.reserve_tb
   -- 外部キー（他のテーブルと同じ内容を示す列）をcustomer_idに設定
   -- 対象は、顧客マスタの顧客ID
   FOREIGN KEY(customer_id) REFERENCES work.customer_tb(customer_id)
-)
--- データの分散方法をKEY（指定した列の値に応じて分散）に設定
-DISTSTYLE KEY
-
--- 分散KEYをcheckin_dateに設定
-DISTKEY (checkin_date);
-
--- データをロードするテーブルをwork.reserve_tbに指定
-COPY work.reserve_tb
-
--- データのロード元となるcsvファイルをS3上にあるreserve.csvに指定
-FROM 's3://awesomebk/reserve.csv'
-
--- S3にアクセスするためのAWSの認証情報を設定
-CREDENTIALS 'aws_access_key_id=XXXXX;aws_secret_access_key=XXXXX'
-
--- 利用するリージョン（クラウドサービスの地域）を指定
-REGION AS 'us-east-1'
-
--- CSVファイルの1行目には列名が入っているので、それをデータロードしないように設定
-CSV IGNOREHEADER AS 1
+);
+COPY work.reserve_tb FROM '/data/reserve.csv'( delimiter ',', format csv, header true );
 
 -- DATE型に変換するときのフォーマットを指定
-DATEFORMAT 'YYYY-MM-DD'
+-- DATEFORMAT 'YYYY-MM-DD'
 
 -- TIMESTAMP型に変換するときのフォーマットを指定
-TIMEFORMAT 'YYYY-MM-DD HH:MI:SS';
+-- TIMEFORMAT 'YYYY-MM-DD HH:MI:SS';
