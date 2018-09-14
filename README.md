@@ -1,59 +1,122 @@
 # awesomebook
 
+このリポジトリは、[本家](https://github.com/ghmagazine/awesomebook)のサンプルコードをDockerにより実行しやすくしたものです。  
+本家ではデータベースにAmazon Redshiftを用いていますが、こちらではPostgreSQLを用いています。  
+細かな仕様の違いがあるため、書籍とは挙動が異なる可能性がありますのでご注意ください。
+
 ## 『前処理大全』のサンプルコード
 
-本橋智光　著、株式会社ホクソエム　監修
-B5変／366ページ／本体価格3,000円＋税
-ISBN978-4-7741-9647-3
-技術評論社、2018年発行
+本橋智光　著、株式会社ホクソエム　監修  
+B5変／366ページ／本体価格3,000円＋税  
+ISBN978-4-7741-9647-3  
+技術評論社、2018年発行  
 
+## サンプルコードの実行
 
-## 各言語の前処理実行方法
+Python/R/SQLのスクリプトを実行する手順を説明します。
 
-### SQLの前処理実行
+### 1. 各サービスの起動
 
-1. AWS Redshiftの準備
-  - https://aws.amazon.com/jp/redshift/getting-started/
-2. SQL Workbench/J を使用して、Redshiftに接続
-  - https://docs.aws.amazon.com/ja_jp/redshift/latest/mgmt/connecting-using-workbench.html
-3. AWS S3の準備
-  - https://aws.amazon.com/jp/s3/
-4. S3にデータをアップロード
-  - dataフォルダ配下のcsvをs3上にアップロード
-5. DDLを実行
-  - preprocess/load_data/ddl配下のDDLのSQLにAWSのKey情報を設定し、実行
-6. 各前処理の実行
-  - preprocessフォルダ配下の前処理コードを実行
+データベースにPostgreSQLを、Python/Rの実行環境としてJupyterを用いています。  
+また、データベース管理にAdminerも入れています。
 
-### Rの前処理実行
+```console
+$ git clone https://github.com/uphy/awesomebook
+$ cd awesomebook/docker
+$ docker-compose up -d
+```
 
-1. Rのインストール
-  - https://www.r-project.org/
-2. RStudioのインストール
-  - https://www.rstudio.com/products/rstudio/
-3. RStudioの起動
-  - インストールしたRStudioを起動
-4. WorkinkDirectoryの設定
-  - ```setwd('awesomebook_codeのパス')```
-5. コードに必要なパッケージをインストール
-  - ```install.packages('パッケージ名')```
-6. 各前処理の実行
-  - preprocessフォルダ配下の前処理コードを実行
+特にJupyterのイメージが大きく(6 GB)、取得に時間がかかります。
 
+### 2. PostgreSQLへのサンプルデータ登録
 
-### Pythonの前処理実行
+念の為PostgreSQLの起動を確認します。
 
-1. Python3のインストール
-  - https://www.python.org/
-2. PyCharmのインストール
-  - https://www.jetbrains.com/pycharm/
-3. PyCharmの起動
-  - インストールしたPyCharmを起動
-4. ターミナルからpipコマンドを実行して、コードに必要なライブラリをインストール
-  - ```pip3 install ライブラリ名```
-5. 各前処理の実行
-  - preprocessフォルダ配下の前処理コードを実行
+```console
+$ cd docker
+$ docker-compose logs --tail 5 postgres
+Attaching to awesomebook_postgres_1
+postgres_1  |
+postgres_1  | LOG:  database system was shut down at 2018-09-14 23:30:45 UTC
+postgres_1  | LOG:  MultiXact member wraparound protections are now enabled
+postgres_1  | LOG:  database system is ready to accept connections
+postgres_1  | LOG:  autovacuum launcher started
+```
 
+上記のように表示され起動が確認できたら、以下のコマンドでサンプルデータを登録できます。
+
+```console
+$ ./load_data.sh
+CREATE SCHEMA
+CREATE TABLE
+COPY 1000
+CREATE TABLE
+COPY 1186
+CREATE TABLE
+COPY 300
+CREATE TABLE
+COPY 49
+CREATE TABLE
+COPY 1000
+CREATE TABLE
+COPY 1000
+CREATE TABLE
+COPY 4030
+```
+
+### 3. 各種スクリプトの実行
+
+Python/R/SQLのスクリプトを、`run.sh`で実行できます。
+
+例)
+
+```console
+$ ./run.sh preprocess/002_selection/02/a_sql_2_awesome.sql
+ reserve_id | hotel_id | customer_id |  reserve_datetime   | checkin_date | checkin_time | checkout_date | people_num | total_price
+------------+----------+-------------+---------------------+--------------+--------------+---------------+------------+-------------
+ r285       | h_121    | c_67        | 2016-09-27 06:13:19 | 2016-10-12   | 12:00:00     | 2016-10-14    |          4 |      184000
+ r1933      | h_113    | c_477       | 2016-09-24 09:04:26 | 2016-10-12   | 11:30:00     | 2016-10-13    |          4 |       77200
+ r2291      | h_230    | c_574       | 2016-10-09 04:34:14 | 2016-10-12   | 12:00:00     | 2016-10-13    |          1 |       17400
+ r2524      | h_203    | c_631       | 2016-09-14 10:45:15 | 2016-10-12   | 10:30:00     | 2016-10-14    |          3 |      167400
+ r3147      | h_163    | c_794       | 2016-10-02 07:35:16 | 2016-10-13   | 09:00:00     | 2016-10-16    |          1 |       64200
+ r3328      | h_23     | c_833       | 2016-09-28 08:22:57 | 2016-10-13   | 09:00:00     | 2016-10-14    |          4 |      260400
+ r3381      | h_110    | c_844       | 2016-09-17 17:44:02 | 2016-10-13   | 12:30:00     | 2016-10-15    |          1 |       52800
+ r3444      | h_14     | c_859       | 2016-10-03 17:26:00 | 2016-10-13   | 12:30:00     | 2016-10-15    |          3 |       46200
+(8 rows)
+```
+
+### 4. 後片付け
+
+作成したコンテナ、イメージ、作業データ等を削除します。
+
+```console
+$ cd docker
+$ docker-compose down --rmi all
+$ rm -rf data
+```
+
+## Tips
+
+### Adminerへのログイン
+
+http://localhost:8000/ を開き、以下の設定でログインしてください。
+
+|項目|設定値|
+|--------|--------------|
+| Server | postgres |
+| User | postgres |
+| Password | postgres |
+| Database | work |
+
+### Jupyter Notebookへのログイン
+
+以下のコマンドでログインのためのトークンを確認してください。
+
+```console
+$ docker-compose logs jupyter | grep token= | head -n1 | sed -e "s/.*token=\(.*\)/\1/"
+```
+
+http://localhost:8888/ を開き、確認したトークンを入力し、ログインしてください。
 
 ## 目次
 
