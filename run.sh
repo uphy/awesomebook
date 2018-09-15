@@ -18,10 +18,10 @@ run_python(){
 
 run_R(){
     local filename=$(basename "$1")
-    cp "$1" . || exit 1
+    compose jupyter cp "$1" . || exit 1
     compose jupyter Rscript "$filename"
     local result=$?
-    rm -f "$filename"
+    compose jupyter rm -f "$filename"
     exit $result
 }
 
